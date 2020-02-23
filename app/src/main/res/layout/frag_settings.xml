@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.hexabitz.bluetoothweightscale.Fragments.Settings">
+
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Destination"
+            android:textColor="@color/colorPrimary"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toTopOf="@+id/destinationNP"
+            app:layout_constraintEnd_toEndOf="@+id/destinationNP"
+            app:layout_constraintStart_toStartOf="@+id/destinationNP" />
+
+        <NumberPicker
+            android:id="@+id/destinationNP"
+            android:layout_width="66dp"
+            android:layout_height="80dp"
+            android:layout_marginStart="92dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView3" />
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Source"
+            android:textColor="@color/colorPrimary"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toTopOf="@+id/sourceNP"
+            app:layout_constraintEnd_toEndOf="@+id/sourceNP"
+            app:layout_constraintStart_toStartOf="@+id/sourceNP" />
+
+        <NumberPicker
+            android:id="@+id/sourceNP"
+            android:layout_width="66dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="264dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.454"
+            app:layout_constraintStart_toEndOf="@+id/destinationNP"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+    </android.support.constraint.ConstraintLayout>
+
+</FrameLayout>
