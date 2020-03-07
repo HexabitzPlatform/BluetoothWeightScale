@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Spinner;
 import android.widget.Switch;
@@ -83,6 +84,9 @@ public class H26R0_LOAD_CELL extends Fragment {
     final Switch LoadCellSwitch = rootView.findViewById(R.id.LoadCellSwitch);
     final TextView weightLBL = rootView.findViewById(R.id.weightLBL);
 
+    Button zeroBTN = rootView.findViewById(R.id.zeroBTN);
+
+
 
     final Switch infiniteTimeSwitch = rootView.findViewById(R.id.infiniteTimeSwitch);
 
@@ -149,6 +153,18 @@ public class H26R0_LOAD_CELL extends Fragment {
           TimeOutTV.setEnabled(true);
           infiniteTimeSwitch.setText("Off");
         }
+      }
+    });
+
+    zeroBTN.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        Code = HexaInterface.Message_Codes.CODE_H26R0_ZEROCAL;
+        Payload = new byte[]{ };
+
+        SendMessage();
+
+
       }
     });
 

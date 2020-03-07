@@ -69,8 +69,6 @@ public class MainActivity extends AppCompatActivity {
 
     LoadFragment(Modules);
 
-    ReceiveDataTask = new ReceiveDataTask();
-
   }
 
   @Override
@@ -181,6 +179,7 @@ public class MainActivity extends AppCompatActivity {
 
     weightLBL = findViewById(R.id.weightLBL);
     ReceiveDataTask = new ReceiveDataTask();
+
     ReceiveDataTask.execute();
   }
 
