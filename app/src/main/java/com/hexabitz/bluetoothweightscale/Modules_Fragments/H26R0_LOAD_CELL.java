@@ -14,7 +14,7 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import com.bendaschel.sevensegmentview.SevenSegmentView;
+//import com.bendaschel.sevensegmentview.SevenSegmentView;
 import com.hexabitz.bluetoothweightscale.Fragments.Settings;
 import com.hexabitz.bluetoothweightscale.JAVA_COMS_LIB.HexaInterface;
 import com.hexabitz.bluetoothweightscale.MainActivity;
@@ -174,7 +174,7 @@ public class H26R0_LOAD_CELL extends Fragment {
 
   private void SendMessage() {
     if (!isLocked) {
-      ((MainActivity) Objects.requireNonNull(getActivity())).SendMessage((byte) Settings.Destination, (byte) Settings.Source, Code, Payload);
+      ((MainActivity) getActivity()).SendMessage((byte) Settings.Destination, (byte) Settings.Source, Code, Payload);
       isLocked = true;
       t.schedule(new TimerTask() {
         @Override
@@ -186,9 +186,10 @@ public class H26R0_LOAD_CELL extends Fragment {
   }
 
   private void ReceiveMessage() {
-    ((MainActivity) Objects.requireNonNull(getActivity())).ReceiveMessage();
+    ((MainActivity) getActivity()).ReceiveMessage();
   }
+
   private void StopReceiving() {
-    ((MainActivity) Objects.requireNonNull(getActivity())).StopReceiving();
+    ((MainActivity) getActivity()).StopReceiving();
   }
 }
