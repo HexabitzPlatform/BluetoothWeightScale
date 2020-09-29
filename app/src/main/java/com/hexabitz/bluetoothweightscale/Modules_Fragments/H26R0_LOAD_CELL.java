@@ -86,8 +86,6 @@ public class H26R0_LOAD_CELL extends Fragment {
 
     Button zeroBTN = rootView.findViewById(R.id.zeroBTN);
 
-
-
     final Switch infiniteTimeSwitch = rootView.findViewById(R.id.infiniteTimeSwitch);
 
 
@@ -163,7 +161,6 @@ public class H26R0_LOAD_CELL extends Fragment {
         Payload = new byte[]{ };
 
         SendMessage();
-
 
       }
     });

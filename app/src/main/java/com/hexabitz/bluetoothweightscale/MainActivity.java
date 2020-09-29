@@ -13,16 +13,22 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.hexabitz.bluetoothweightscale.Fragments.Modules;
 import com.hexabitz.bluetoothweightscale.JAVA_COMS_LIB.Message;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.nio.ByteBuffer;
 import java.text.DecimalFormat;
 import java.util.UUID;
+
+import java.net.Socket;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,6 +40,15 @@ public class MainActivity extends AppCompatActivity {
   private BluetoothDevice bluetoothDevice;
   private static InputStream inputStream;
   private OutputStream outputStream;
+
+  private boolean wifi;
+  private PrintWriter output;
+  private BufferedReader input;
+  private Socket socket;
+  Thread Thread1 = null;
+
+
+
 
   public String Opt8_Next_Message = "0";
   public String Opt67_Response_Options = "01";
@@ -60,15 +75,23 @@ public class MainActivity extends AppCompatActivity {
     BottomNavigationView navView = findViewById(R.id.nav_view);
     navView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-    String DeviceName = getIntent().getStringExtra("DeviceName");
-    String DeviceAddress = getIntent().getStringExtra("DeviceAddress");
+    wifi = getIntent().getBooleanExtra("wifi", false);
 
-    setTitle("Connected to " + DeviceName);
-
-    connectToDevice(DeviceAddress);
-
+    if (!wifi){
+      String DeviceName = getIntent().getStringExtra("DeviceName");
+      String DeviceAddress = getIntent().getStringExtra("DeviceAddress");
+      setTitle("Connected to " + DeviceName);
+      bluetoothConnect(DeviceAddress);
+    }
+    else
+    {
+      String SERVER_IP = getIntent().getStringExtra("SERVER_IP");
+      int SERVER_PORT = getIntent().getIntExtra("SERVER_PORT",0);
+      setTitle("Connected to " + SERVER_IP);
+      Thread1 = new Thread(new WiFiConnection(SERVER_IP, SERVER_PORT));
+      Thread1.start();
+    }
     LoadFragment(Modules);
-
   }
 
   @Override
@@ -85,9 +108,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-      switch (item.getItemId()) {
-        case R.id.navigation_modules:
-          return LoadFragment(Modules);
+      if (item.getItemId() == R.id.navigation_modules) {
+        return LoadFragment(Modules);
 //        case R.id.navigation_settings: return LoadFragment(Settings);
       }
       return false;
@@ -105,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
     return false;
   }
 
-  private void connectToDevice(String address) {
+  private void bluetoothConnect(String address) {
     UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb"); //Standard SerialPortService ID
     BluetoothSocket tmp;
     BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -146,6 +168,31 @@ public class MainActivity extends AppCompatActivity {
     }
   }
 
+  class WiFiConnection implements Runnable {
+    private String SERVER_IP;
+    private int SERVER_PORT;
+    public WiFiConnection(String SERVER_IP, int SERVER_PORT) {
+      this.SERVER_IP = SERVER_IP;
+      this.SERVER_PORT = SERVER_PORT;
+    }
+
+    public void run() {
+      try {
+        socket = new Socket(SERVER_IP, SERVER_PORT);
+        output = new PrintWriter(socket.getOutputStream());
+        input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            Toast.makeText(MainActivity.this, "Connected", Toast.LENGTH_SHORT).show();
+          }
+        });
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+  }
+
   // Method to send the buffer to Hexabitz modules.
   public void SendMessage(byte Destination, byte Source, int Code, byte[] Payload) {
     if (Code > 255)
@@ -164,6 +211,7 @@ public class MainActivity extends AppCompatActivity {
     AllMessage = _Message.GetAll();  // We get the whole buffer bytes to be sent to the Hexabitz modules.
 
 
+    if(!wifi)
     try {
       outputStream.write(AllMessage, 0, AllMessage.length);
     } catch (IOException e) {

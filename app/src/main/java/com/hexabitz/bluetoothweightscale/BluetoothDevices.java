@@ -44,6 +44,16 @@ public class BluetoothDevices extends AppCompatActivity {
       }
     });
 
+    FloatingActionButton wifiFAB = findViewById(R.id.wifiFAB);
+    wifiFAB.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        Intent Intent = new Intent(BluetoothDevices.this, WiFiConnection.class);
+        startActivity(Intent);
+      }
+    });
+
+
     listView = findViewById(R.id.listView);
     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
       @Override
