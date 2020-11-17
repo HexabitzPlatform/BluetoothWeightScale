@@ -122,8 +122,8 @@ public class H26R0_LOAD_CELL extends Fragment {
               6,
               1};
           SendMessage();
-          if(Code != HexaInterface.Message_Codes.CODE_H26R0_STOP)
-            ReceiveMessage();
+//          if(Code != HexaInterface.Message_Codes.CODE_H26R0_STOP)
+//            ReceiveMessage();
         }
         else
         {

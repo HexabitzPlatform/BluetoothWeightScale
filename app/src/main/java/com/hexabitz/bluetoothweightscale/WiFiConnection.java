@@ -49,16 +49,8 @@ public class WiFiConnection extends AppCompatActivity {
         tvMessages.setText("");
         SERVER_IP = etIP.getText().toString().trim();
         SERVER_PORT = Integer.parseInt(etPort.getText().toString().trim());
-//        try {
-//          Socket socket = new Socket(SERVER_IP, SERVER_PORT);
-//          output = new PrintWriter(socket.getOutputStream());
-//          input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-//          Toast.makeText(WiFiConnection.this, "Connected", Toast.LENGTH_SHORT).show();
-//        } catch (IOException e) {
-//          Toast.makeText(WiFiConnection.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-//        }
-        Thread1 = new Thread(new Thread1());
-        Thread1.start();
+//        Thread1 = new Thread(new Thread1());
+//        Thread1.start();
       }
     });
 
@@ -70,7 +62,6 @@ public class WiFiConnection extends AppCompatActivity {
         Intent.putExtra("wifi", true);
         Intent.putExtra("SERVER_IP",  SERVER_IP);
         Intent.putExtra("SERVER_PORT",  SERVER_PORT);
-        Thread1.destroy();
         startActivity(Intent);
       }
     });
@@ -86,8 +77,6 @@ public class WiFiConnection extends AppCompatActivity {
       }
     });
   }
-
-
 
 
   class Thread1 implements Runnable {

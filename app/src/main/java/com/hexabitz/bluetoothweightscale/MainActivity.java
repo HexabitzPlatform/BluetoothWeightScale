@@ -41,13 +41,14 @@ public class MainActivity extends AppCompatActivity {
   private static InputStream inputStream;
   private OutputStream outputStream;
 
+  static TextView weightLBL;
+
+
   private boolean wifi;
   private PrintWriter output;
   private BufferedReader input;
   private Socket socket;
   Thread Thread1 = null;
-
-
 
 
   public String Opt8_Next_Message = "0";
@@ -168,6 +169,60 @@ public class MainActivity extends AppCompatActivity {
     }
   }
 
+
+
+  // Method to send the buffer to Hexabitz modules.
+  public void SendMessage(byte Destination, byte Source, int Code, byte[] Payload) {
+    if (Code > 255)
+      Opt2_16_BIT_Code = "1";
+    else
+      Opt2_16_BIT_Code = "0";
+    String optionsString = Opt8_Next_Message +
+        Opt67_Response_Options +
+        Opt5_Reserved +
+        Opt34_Trace_Options +
+        Opt2_16_BIT_Code +
+        Opt1_Extended_Flag;
+    byte Options = GetBytes(optionsString)[1];  // 00100000 // 0x20
+
+    Message _Message = new Message(Destination, Source, Options, Code, Payload);
+    AllMessage = _Message.GetAll();  // We get the whole buffer bytes to be sent to the Hexabitz modules.
+
+
+    if(!wifi){
+      try {
+        outputStream.write(AllMessage, 0, AllMessage.length);
+      } catch (IOException e) {
+        Snackbar.make(parentLayout, e.getMessage(), Snackbar.LENGTH_LONG)
+            .setAction("IOException", null).show();
+      }
+    }
+    else {
+      StringBuilder stringBuilder = new StringBuilder();
+      for (byte _byte: AllMessage){
+        stringBuilder.append(_byte).append(" ");
+      }
+      new Thread(new WiFiSend(stringBuilder.toString())).start();
+    }
+  }
+
+
+  public void ReceiveMessage() {
+
+    weightLBL = findViewById(R.id.weightLBL);
+
+    if(!wifi) {
+      ReceiveDataTask = new ReceiveDataTask();
+      ReceiveDataTask.execute();
+    }
+    else
+    {
+      new Thread(new WiFiReceive()).start();
+    }
+
+  }
+
+  //region WIFI
   class WiFiConnection implements Runnable {
     private String SERVER_IP;
     private int SERVER_PORT;
@@ -193,43 +248,50 @@ public class MainActivity extends AppCompatActivity {
     }
   }
 
-  // Method to send the buffer to Hexabitz modules.
-  public void SendMessage(byte Destination, byte Source, int Code, byte[] Payload) {
-    if (Code > 255)
-      Opt2_16_BIT_Code = "1";
-    else
-      Opt2_16_BIT_Code = "0";
-    String optionsString = Opt8_Next_Message +
-        Opt67_Response_Options +
-        Opt5_Reserved +
-        Opt34_Trace_Options +
-        Opt2_16_BIT_Code +
-        Opt1_Extended_Flag;
-    byte Options = GetBytes(optionsString)[1];  // 00100000 // 0x20
-
-    Message _Message = new Message(Destination, Source, Options, Code, Payload);
-    AllMessage = _Message.GetAll();  // We get the whole buffer bytes to be sent to the Hexabitz modules.
-
-
-    if(!wifi)
-    try {
-      outputStream.write(AllMessage, 0, AllMessage.length);
-    } catch (IOException e) {
-      Snackbar.make(parentLayout, e.getMessage(), Snackbar.LENGTH_LONG)
-          .setAction("IOException", null).show();
+  class WiFiSend implements Runnable {
+    private String message;
+    WiFiSend(String message) {
+      this.message = message;
     }
-
+    @Override
+    public void run() {
+      output.write(message);
+      output.flush();
+      runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          Toast.makeText(MainActivity.this, "Data Sent", Toast.LENGTH_SHORT).show();
+        }
+      });
+    }
   }
 
-  static TextView weightLBL;
-
-  public void ReceiveMessage() {
-
-    weightLBL = findViewById(R.id.weightLBL);
-    ReceiveDataTask = new ReceiveDataTask();
-
-    ReceiveDataTask.execute();
+  class WiFiReceive implements Runnable {
+    @Override
+    public void run() {
+      while (true) {
+        try {
+          final String message = input.readLine();
+          if (message != null) {
+            runOnUiThread(new Runnable() {
+              @Override
+              public void run() {
+                weightLBL.setText(message);
+              }
+            });
+          } else {
+            Thread1 = new Thread(new WiFiReceive());
+            Thread1.start();
+            return;
+          }
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+    }
   }
+
+  //endregion
 
   public static class ReceiveDataTask extends AsyncTask<String, String, String> {
 
@@ -280,7 +342,11 @@ public class MainActivity extends AppCompatActivity {
 
   public void StopReceiving()
   {
-    ReceiveDataTask.cancel(true);
+    try{
+      ReceiveDataTask.cancel(true);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
   //get byte from string
